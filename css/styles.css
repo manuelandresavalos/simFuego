@@ -1,0 +1,9 @@
+.cube {
+	width: 100px;
+	height: 100px;
+	display: block;
+	border: 1px solid #000;
+}
+/*.terrainSprite {
+	background: url('../img/terrain.png');
+}*/
