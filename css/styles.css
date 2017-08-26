@@ -1,9 +1,5 @@
-.cube {
-	width: 100px;
-	height: 100px;
+canvas {
 	display: block;
-	border: 1px solid #000;
+    margin: auto;
+    padding: 23%;
 }
-/*.terrainSprite {
-	background: url('../img/terrain.png');
-}*/
