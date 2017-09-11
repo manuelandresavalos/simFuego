@@ -14,19 +14,19 @@ $(document).ready(function(){
 	var game_loop;
 	var terrainMap = [
 		[7,7,7,7,7,7,7,7,7,7,7,7,7,7],
-		[7,7,7,7,7,7,7,7,7,7,7,7,1,7],
-		[7,7,7,1,7,7,7,7,7,7,7,7,7,7],
+		[7,7,7,7,7,7,7,7,7,7,7,7,7,7],
+		[7,7,7,7,7,7,7,7,7,7,7,7,7,7],
 		[7,7,7,7,7,7,7,7,7,7,7,7,7,7],
 		[7,7,7,7,7,7,4,4,4,7,7,7,7,7],
 		[7,7,7,7,7,7,4,7,4,7,7,7,7,7],
 		[7,7,7,7,7,7,4,7,4,7,7,7,7,7],
 		[7,7,7,7,7,7,4,7,4,7,7,7,7,7],
-		[7,7,7,7,7,7,4,4,4,7,7,7,7,7],
-		[7,7,7,7,7,7,7,7,7,7,7,7,7,7],
-		[7,7,7,7,7,7,7,7,7,7,7,7,7,7],
-		[7,7,7,7,7,7,7,7,7,7,7,7,7,7],
-		[7,7,7,7,7,7,7,7,7,7,7,7,7,7],
-		[7,7,7,7,7,7,7,7,7,7,1,7,7,7]
+		[7,7,7,7,7,7,4,7,4,7,7,7,7,7],
+		[7,7,7,7,7,7,4,7,4,4,4,4,4,7],
+		[7,7,7,7,7,7,4,7,4,7,7,7,7,7],
+		[7,7,7,4,4,4,4,7,4,7,7,7,7,7],
+		[7,7,7,7,7,7,7,7,4,7,7,7,7,7],
+		[1,7,7,7,7,7,4,7,4,7,7,7,7,7]
 	];
 
 	/*OBJETOS*/
@@ -74,6 +74,7 @@ $(document).ready(function(){
 				objetos[terrainMap[fila][col]].id = 'col' + col + 'fila' + fila;
 				//Agrego cada objeto en la casilla que le corresponde.
 				terrainMap[fila][col] = objetos[terrainMap[fila][col]];
+				//console.log("terrainMap["+fila+"]["+col+"] = ", terrainMap[fila][col]);
 			}
 		}
 	}
@@ -128,11 +129,11 @@ $(document).ready(function(){
 				downObject = (fila + 1 >= 0 && fila + 1 < filaLeng) ? terrainMap[fila + 1][col] : false;
 
 				if (fuego.category == 'fuego') {// Si estoy en una casilla con fuego:
-					//console.log('['+fila+'-'+col+'] id: ' + fuego.id);
 					// LEFT
 					if (leftObject) {
 						if (leftObject.id != 'fuego') {// El material no es fuego?
 							if (checkIteractionWithFire(fuego, leftObject)) {
+								objetos[1].id = 'col' + col + 'fila' + fila;
 								nextTerrainMap[fila][col - 1] = objetos[1]; //pinto fuego es esa casilla
 							}
 						}
@@ -140,9 +141,9 @@ $(document).ready(function(){
 
 					//RIGTH
 					if (rightObject) {
-						console.log("rightObject: " + topObject.id);
 						if (rightObject.id != 'fuego') {// El material no es fuego?
 							if (checkIteractionWithFire(fuego, rightObject)) {
+								objetos[1].id = 'col' + col + 'fila' + fila;
 								nextTerrainMap[fila][col + 1] = objetos[1]; //pinto fuego es esa casilla
 							}
 						}
@@ -152,6 +153,7 @@ $(document).ready(function(){
 					if (topObject) {
 						if (topObject.id != 'fuego') {// El material no es fuego?
 							if (checkIteractionWithFire(fuego, topObject)) {
+								objetos[1].id = 'col' + col + 'fila' + fila;
 								nextTerrainMap[fila - 1][col] = objetos[1]; //pinto fuego es esa casilla
 							}
 						}
@@ -161,19 +163,17 @@ $(document).ready(function(){
 					if (downObject) {
 						if (downObject.id != 'fuego') {// El material no es fuego?
 							if (checkIteractionWithFire(fuego, downObject)) {
+								objetos[1].id = 'col' + col + 'fila' + fila;
 								nextTerrainMap[fila + 1][col] = objetos[1]; //pinto fuego es esa casilla
 							}
 						}
 					}
-
-					fuego.fuel = fuego.fuel - 10;
-					if (fuego.fuel <= 0) {
-						fuego = objetos[8]; // Si se acabó el fuego, lo pinto como ceniza
-						nextTerrainMap[fila][col] = fuego;
-					}
 				}
 			}
 		};
+
+		nextTerrainMap = fuelUsage(nextTerrainMap);
+
 		console.log("--------------------");
 		for (var fila = 0; fila < nextTerrainMap.length ; fila++) {
 			for (var col = 0; col < nextTerrainMap[fila].length; col++) {
@@ -182,6 +182,23 @@ $(document).ready(function(){
 				}
 			}
 		}
+	}
+
+	var fuelUsage = function fuelUsage(nextTerrainMap) {
+		for (var fila = 0; fila < terrainMap.length ; fila++) {
+			for (var col = 0; col < terrainMap[fila].length; col++) {
+				if (terrainMap[fila][col].category == 'fuego') {
+					var fuego = terrainMap[fila][col];
+					console.log("fuego.id = " + fuego.id + " - " + fuego.fuel);
+					fuego.fuel = fuego.fuel - 10;
+					if (fuego.fuel <= 0) {
+						fuego = objetos[8]; // Si se acabó el fuego, lo pinto como ceniza
+						nextTerrainMap[fila][col] = fuego;
+					}
+				}
+			}
+		}
+		return nextTerrainMap;
 	}
 
 	var checkIteractionWithFire = function checkIteractionWithFire(fire, objetoSecundario) {
@@ -217,7 +234,7 @@ $(document).ready(function(){
 		draw_terrain();
 	}
 
-	game_loop = setInterval(loop, 1000);
+	game_loop = setInterval(loop, 500);
 	
 	//
 	init();
